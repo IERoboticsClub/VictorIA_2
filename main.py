@@ -44,8 +44,6 @@ def main():
     tf.keras.utils.disable_interactive_logging()
 
     image_path = "Images/connect4_6.jpeg"
-    player1_color = (88, 168, 55)
-    player2_color = (213, 84, 89)
 
     """START OF MAIN"""
     # Load this at the start so it doesn't have to be loaded multiple times
@@ -90,7 +88,7 @@ def main():
 
         best_mask = masks[np.argmax(scores)]
 
-        # Border detection
+        # border detection
         # POSSIBLE TO CONVERT ALL OF THIS IN ONE FUNCTION
         detector = BorderDetector(best_mask)
         left_m, left_b = detector.find_left_border()
@@ -98,7 +96,7 @@ def main():
         right_m, right_b = detector.find_right_border()
         bottom_m, bottom_b = detector.find_bottom_border()
 
-        # Calculate intersections
+        # calculate intersections
         try:
             top_left = calculate_intersection(left_m, left_b, top_m, top_b)
             top_right = calculate_intersection(right_m, right_b, top_m, top_b)
