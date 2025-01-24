@@ -1,56 +1,48 @@
-#from utils.circle_detection_utils import divide_picture_into_cells
-import sys
-import time
+from operator import index
 
-import numpy as np
+from fontTools.merge.util import first
 
-#from connect4 import predict_move
-#from utils.connect4_utils import find_possible_position_of_next_move
-#from utils.useTeachableMachine import CircleRecognition
-#import tensorflow as tf
-
-#divide_picture_into_cells("Images/rectified_image.jpg", 7, 6)
-
-"""
-matrix, image = process_each_cell("Images/rectified_image.jpg", 7, 6)
-for row in matrix:
-    print(row)"""
-
-matrix = np.matrix(([0, 0, 0, 0, 0, 0, 0],
-           [0, 0, 0, 0, 0, 0, 0],
-           [0, 0, 0, 0, 0, 0, 0],
-           [0, 0, 0, 0, 0, 0, 0],
-           [0, 0, 0, 0, 0, 0, 0],
-           [0, 0, 1, 0, 1, 2, 0]))
-
-last_matrix = np.matrix(([0, 0, 0, 0, 0, 0, 0],
-           [0, 0, 0, 0, 0, 0, 0],
-           [0, 0, 0, 0, 0, 0, 0],
-           [0, 0, 0, 0, 0, 0, 0],
-           [0, 0, 0, 0, 0, 0, 0],
-           [0, 0, 0, 0, 1, 2, 0]))
-
-new_matrix = matrix-last_matrix
-
-print(new_matrix.mean()*6*7)
-print(new_matrix.max())
-print(new_matrix)
+nums = [3,2,3]
+nums = [0,3,-3,4,-1]
+nums = [2,1,9,4,4,56,90,3]
+nums =  [0,3,-3,4,-1]
+target = -1
 
 
-while True:
-    fps =+ 1
-    status_message = "Waiting for input"
-
-    import sys
-
-    # Replace this section in your loop
-    print(f"\rFPS: {fps:.2f} | Matrix:\n{matrix} | Status: {status_message}", end='', flush=True)
-
-    time.sleep(1)
 
 
-"""
-matrix = numpy.array(matrix)
 
-model = tf.keras.models.load_model("connect4_model_v1.h5")
-print(predict_move(model, matrix))"""
+
+def twoSum(nums,target):
+    filter_nums=nums[:]
+    filter_nums.sort()
+    while True:
+        first_number=filter_nums[0]
+        for second_index in range(1,len(filter_nums)):
+            second_number=filter_nums[second_index]
+            if (first_number+second_number or second_number+first_number)==target:
+                if first_number==second_number:
+                    index_0=nums.index(first_number)
+                    index_1=nums[index_0+1:].index(second_number)+index_0+1
+                else:
+                    index_0=nums.index(first_number)
+                    index_1=nums.index(second_number)
+                return [index_0, index_1]
+            elif (first_number+second_number)>target:
+                filter_nums=filter_nums[:second_index]
+                break
+        filter_nums=filter_nums[1:]
+
+def isValid(self, s: str) -> bool:
+    for x in s:
+        if x == "(":
+            if ")" in s:
+
+                s[:s.index(")")] = ""
+
+
+        elif x == "[":
+            None
+
+        elif x == "{":
+            None

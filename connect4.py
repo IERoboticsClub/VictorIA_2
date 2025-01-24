@@ -2,6 +2,8 @@ import numpy as np
 import math
 import random
 
+# TODO: Implement the minimax algorithm with alpha-beta pruning, this one is just stole from the internet
+
 # Global constants
 ROWS = 6
 COLS = 7

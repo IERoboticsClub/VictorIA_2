@@ -10,6 +10,7 @@ from tkinter import filedialog
 
 import numpy as np
 import matplotlib.pyplot as plt
+import requests
 
 from ImagePointSelection import ImageClick
 from connect4 import predict
@@ -39,6 +40,11 @@ def main():
     DEBUG = False
     MULTY_TREAD = True
     robot = 1 # 1 for player 1, 2 for player 2
+
+    CONNECT_ROBOT = True
+    ROBOT_SERVER_URL = "http://192.168.202.243:5000/move"  # "http://127.0.0.1:5000/move"
+    #payload = {"column": int(0)}
+    #resp = requests.post(ROBOT_SERVER_URL, json=payload)
 
     # Suppress TensorFlow debugging logs
     tf.keras.utils.disable_interactive_logging()
@@ -147,6 +153,18 @@ def main():
 
     move, score = predict(matrix)
     print("Predicted move:", move)
+    if CONNECT_ROBOT and requests is not None:
+        payload = {"column": int(move)}
+        try:
+            resp = requests.post(ROBOT_SERVER_URL, json=payload)
+            if resp.status_code == 200:
+                print(f"\n[Robot] Move {move} sent successfully.")
+                did_not_already_send = False
+
+            else:
+                print(f"\n[Robot] Error sending move, status code: {resp.status_code}")
+        except Exception as e:
+            print(f"\n[Robot] Exception sending move: {e}")
 
     while True:
         frame_count += 1
@@ -178,6 +196,19 @@ def main():
             player_that_needs_to_play = 1
             move, best_score = predict(matrix)
             status_message = f"Player 2 has played | Predicted move: {move}"
+            if CONNECT_ROBOT and requests is not None:
+                payload = {"column": int(move)}
+                try:
+                    resp = requests.post(ROBOT_SERVER_URL, json=payload)
+                    if resp.status_code == 200:
+                        print(f"\n[Robot] Move {move} sent successfully.")
+                        did_not_already_send = False
+
+                    else:
+                        print(f"\n[Robot] Error sending move, status code: {resp.status_code}")
+                except Exception as e:
+                    print(f"\n[Robot] Exception sending move: {e}")
+
             print(f"\rFPS: {fps:.2f} | Matrix:\n{matrix} | Status: {status_message}", end='', flush=True)
 
         else:

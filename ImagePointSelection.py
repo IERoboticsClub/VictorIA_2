@@ -1,10 +1,9 @@
 import tkinter as tk
-from tkinter import filedialog, messagebox
+from tkinter import messagebox
 
 import numpy as np
 from PIL import Image, ImageTk
-import cv2  # OpenCV for webcam functionality
-
+import cv2
 
 class ImageClick:
     def __init__(self, root, callback, image_path, USE_WEBCAM=False):
@@ -14,23 +13,23 @@ class ImageClick:
         self.filepath = image_path
         self.root.title("Connect 4")
 
-        # Create a main frame to hold canvas and buttons
+        # create a main frame to hold canvas and buttons
         self.main_frame = tk.Frame(self.root)
         self.main_frame.pack(fill=tk.BOTH, expand=True)
 
-        # Canvas to display image or webcam feed
+        # canvas to display image or webcam feed
         self.canvas = tk.Canvas(self.main_frame, bg="white")
         self.canvas.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
 
-        # Frame for buttons
+        # frame for buttons
         self.button_frame = tk.Frame(self.main_frame)
         self.button_frame.pack(side=tk.BOTTOM, fill=tk.X, pady=10)
 
-        # List to store points and labels
+        # list to hold all positive and negative points
         self.points = []
         self.labels = []
 
-        # Initialize variables for webcam
+        # initialize variables for webcam
         self.cap = None
         self.is_capturing = False
         self.frame = None
@@ -41,9 +40,9 @@ class ImageClick:
         else:
             self.load_image()
 
-        # Bind mouse clicks to the canvas
+        # bind mouse clicks to the canvas
         self.canvas.bind("<Button-1>", self.on_left_click)
-        # Bind both right-click buttons for compatibility
+        # bind both right-click buttons for compatibility (MACOS)
         self.canvas.bind("<Button-2>", self.on_right_click)
         self.canvas.bind("<Button-3>", self.on_right_click)
 
@@ -67,22 +66,22 @@ class ImageClick:
     def show_webcam_preview(self):
         """Continuously capture frames from the webcam and display them."""
         if not self.is_capturing:
-            return  # Stop updating if no longer capturing
+            return
 
         ret, frame = self.cap.read()
         if ret:
-            # Convert to PIL for display
+            # convert to PIL for display
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             preview_img = Image.fromarray(frame)
 
-            # Resize the webcam feed to a smaller size so buttons remain visible
+            # resize the webcam feed to a smaller size so buttons remain visible
             max_w, max_h = 640, 480
             preview_img.thumbnail((max_w, max_h), Image.Resampling.LANCZOS)
 
             self.display_image = ImageTk.PhotoImage(preview_img)
             self.canvas.config(width=self.display_image.width(), height=self.display_image.height())
 
-            # Clear previous drawings from canvas
+            # clear previous drawings from canvas
             self.canvas.delete("all")
             self.canvas.create_image(0, 0, anchor=tk.NW, image=self.display_image)
 
@@ -94,7 +93,7 @@ class ImageClick:
         if self.cap and self.is_capturing:
             ret, frame = self.cap.read()
             if ret:
-                # Convert the frame to RGB and then to PIL Image
+                # convert the frame to RGB and then to PIL Image
                 frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
                 self.original_image = Image.fromarray(frame)
                 self.filepath = "Images/captured_image.jpg"
@@ -102,11 +101,11 @@ class ImageClick:
 
                 self.orig_width, self.orig_height = self.original_image.size
 
-                # Stop capturing and release the webcam
+                # stop capturing and release the webcam
                 self.is_capturing = False
                 self.cap.release()
 
-                # Process the captured image as if loaded from disk
+                # process the captured image as if loaded from disk
                 self.process_loaded_image()
             else:
                 print("Failed to capture image from webcam.")
@@ -126,14 +125,13 @@ class ImageClick:
 
     def process_loaded_image(self):
         """Process the loaded or captured image: resize and display on canvas."""
-        # Clear any existing preview or drawings from the canvas
         self.canvas.delete("all")
 
-        # Figure out the maximum display size
+        # figure out the maximum display size
         max_width = self.root.winfo_screenwidth() - 150
         max_height = self.root.winfo_screenheight() - 250
 
-        # Determine new size to maintain aspect ratio if needed
+        # determine new size to maintain aspect ratio if needed
         aspect_ratio = self.orig_width / self.orig_height
         if self.orig_width > max_width or self.orig_height > max_height:
             if aspect_ratio > 1:  # landscape
@@ -147,15 +145,15 @@ class ImageClick:
 
         self.new_width, self.new_height = new_width, new_height
 
-        # Compute the scaling factor (to convert canvas coords back to original coords)
+        # compute the scaling factor (to convert canvas coords back to original coords)
         self.scale_x = self.orig_width / self.new_width
         self.scale_y = self.orig_height / self.new_height
 
-        # Create a resized version for display
+        # create a resized version for display
         resized_img = self.original_image.resize((new_width, new_height), Image.Resampling.LANCZOS)
         self.display_image = ImageTk.PhotoImage(resized_img)
 
-        # Update canvas size to match resized image
+        # update canvas size to match resized image
         self.canvas.config(width=new_width, height=new_height)
         self.canvas.create_image(0, 0, anchor=tk.NW, image=self.display_image)
 
@@ -166,7 +164,7 @@ class ImageClick:
             return
 
         canvas_x, canvas_y = event.x, event.y
-        # Convert canvas coords to original image coords
+        # convert canvas coords to original image coords
         orig_x = int(canvas_x * self.scale_x)
         orig_y = int(canvas_y * self.scale_y)
 
@@ -174,7 +172,7 @@ class ImageClick:
         self.points.append((orig_x, orig_y))
         self.labels.append(1)
 
-        # Draw a red circle on the canvas
+        # draw a red circle on the canvas
         self.canvas.create_oval(canvas_x - 5, canvas_y - 5,
                                 canvas_x + 5, canvas_y + 5,
                                 fill="red", outline="white", width=1)
@@ -186,7 +184,7 @@ class ImageClick:
             return
 
         canvas_x, canvas_y = event.x, event.y
-        # Convert canvas coords to original image coords
+        # convert canvas coords to original image coords
         orig_x = int(canvas_x * self.scale_x)
         orig_y = int(canvas_y * self.scale_y)
 
@@ -194,14 +192,14 @@ class ImageClick:
         self.points.append((orig_x, orig_y))
         self.labels.append(0)
 
-        # Draw a blue circle on the canvas
+        # draw a blue circle on the canvas
         self.canvas.create_oval(canvas_x - 5, canvas_y - 5,
                                 canvas_x + 5, canvas_y + 5,
                                 fill="blue", outline="white", width=1)
 
     def end_script(self):
         """
-        When the user presses "End Script",
+        When the user presses "End Calibration",
         convert lists to np.array and pass them to callback,
         then close the GUI.
         """
@@ -209,19 +207,19 @@ class ImageClick:
             messagebox.showinfo("Info", "Please capture an image before ending the script.")
             return
 
-        # Convert to NumPy arrays
+        # convert to NumPy arrays
         points_array = np.array(self.points)
         labels_array = np.array(self.labels)
         print("Final Points array:", points_array)
         print("Final Labels array:", labels_array)
 
-        # Send to the callback
+        # send to the callback to the main script
         self.callback(points_array, labels_array, self.filepath)
 
-        # Cleanup resources
+        # cleanup resources
         if self.cap and self.cap.isOpened():
             self.cap.release()
 
-        # Close the Tk window
+        # close the Tk window
         self.root.quit()
         self.root.destroy()
